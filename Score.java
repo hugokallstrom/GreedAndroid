@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class Score {
 
     Activity activity;
-    ArrayList<Integer> values;
+    ArrayList<Integer> values = new ArrayList<Integer>();
     public Score(Activity activity) {
         this.activity = activity;
     }
@@ -21,26 +21,29 @@ public class Score {
         return totalScore;
     }
 
-    private int calcSingles() {
-        int score = 0;
-        for (Integer value : values) {
-            if(value.equals(5)) score += 50;
-            if(value.equals(1)) score += 100;
+    private boolean isStraight() {
+        if(values.size() != 6) return false;
+        for(int i = 0; i < 6; i++) {
+            for(int j = i + 1; j < 6; j++) {
+                if(values.get(i).equals(values.get(j))) return false;
+            }
         }
-        return score;
+        values.clear();
+        return true;
     }
 
     private int calcThreeOfAKind() {
         if(values.size() < 3) return 0;
         for(int i = 0; i < values.size(); i++) {
-            for(int j = i + 1; j < values.size() - 1; j++) {
-                for(int k = j + 1; k < values.size() - 2; k++) {
+            for(int j = i + 1; j < values.size(); j++) {
+                for(int k = j + 1; k < values.size(); k++) {
                     if(values.get(i).equals(values.get(j)) && values.get(k).equals(values.get(j))) {
-                        values.remove(i);
-                        values.remove(j);
-                        values.remove(k);
-                        if(values.get(i).equals(1)) return 1000;
-                        return values.get(i)*100;
+                        Integer threeValue = values.get(i);
+                        values.remove(threeValue);
+                        values.remove(threeValue);
+                        values.remove(threeValue);
+                        if(threeValue.equals(1)) return 1000;
+                        return threeValue*100;
                     }
                 }
             }
@@ -48,13 +51,36 @@ public class Score {
         return 0;
     }
 
-    private boolean isStraight() {
-        if(values.size() != 6) return false;
-        for(int i = 0; i < 6; i++) {
-            for(int j = i + 1; j < 5; j++) {
-                if(values.get(i).equals(values.get(j))) return false;
+    private int calcSingles() {
+        int score = 0;
+        int fives = 0;
+        int ones = 0;
+        for (Integer value : values) {
+            if(value.equals(5)) {
+                score += 50;
+                fives++;
+            }
+            if(value.equals(1)) {
+                score += 100;
+                ones++;
             }
         }
-        return true;
+        removeSingles(fives, ones);
+        return score;
+    }
+
+    private void removeSingles(int fives, int ones) {
+        Integer five = 5;
+        Integer one = 1;
+        for(int i = 0; i < fives; i++) {
+            values.remove(five);
+        }
+        for(int i = 0; i < ones; i++) {
+            values.remove(one);
+        }
+    }
+
+    public boolean allScores() {
+        return values.isEmpty();
     }
 }

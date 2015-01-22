@@ -2,6 +2,7 @@ package huka.com.greed;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 public class GameActivity extends Activity {
@@ -18,13 +19,10 @@ public class GameActivity extends Activity {
     public void ButtonOnClick(View v) {
         switch (v.getId()) {
             case R.id.throwButton:
-                gameHandler.throwDices();
+                gameHandler.throwDice();
                 break;
             case R.id.scoreButton:
                 gameHandler.saveScore();
-                break;
-            case R.id.saveButton:
-                // add score of dieValues to Turn score
                 break;
             case R.id.die1:
                 gameHandler.toggle(0);
@@ -48,5 +46,18 @@ public class GameActivity extends Activity {
         }
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putBoolean("MyBoolean", true);
+        savedInstanceState.putDouble("myDouble", 1.9);
+        savedInstanceState.putInt("MyInt", 1);
+        savedInstanceState.putString("MyString", "Welcome back to Android");
+    }
 
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.v("test", String.valueOf(gameHandler.getTotalRestult()));
+    }
 }

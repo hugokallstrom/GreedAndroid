@@ -1,11 +1,12 @@
 package huka.com.greed;
 
 import android.app.Activity;
+import android.util.Log;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
 
-public class Die {
+public class Dice {
 
     Activity activity;
     ImageView die1;
@@ -20,7 +21,7 @@ public class Die {
     int[] dieInactiveImages = new int[] {R.drawable.grey1, R.drawable.grey2, R.drawable.grey3, R.drawable.grey4, R.drawable.grey5, R.drawable.grey6};
     ArrayList<Integer> values = new ArrayList<Integer>();
 
-    public Die(Activity activity) {
+    public Dice(Activity activity) {
         this.activity = activity;
         die1 = (ImageView) activity.findViewById(R.id.die1);
         die2 = (ImageView) activity.findViewById(R.id.die2);
@@ -48,31 +49,42 @@ public class Die {
             if (!dieView.isActivated()) {
                 int dieValue = (int) Math.round((Math.random() * (dieImages.length - 1)));
                 dieView.setImageResource(dieImages[dieValue]);
+                dieView.setTag(dieValue);
                 values.add(dieValue + 1);
             }
         }
         return values;
     }
 
-    // TODO: fix toggling images if some dices already toggled
     public void toggle(int die) {
         if(dieViews.get(die).isActivated()) {
-            dieViews.get(die).setImageResource(dieImages[values.get(die) - 1]);
+            Integer tag = (Integer) dieViews.get(die).getTag();
+            dieViews.get(die).setImageResource(dieImages[tag]);
             dieViews.get(die).setActivated(false);
         } else {
-            dieViews.get(die).setImageResource(dieInactiveImages[values.get(die) - 1]);
+            Integer tag = (Integer) dieViews.get(die).getTag();
+            dieViews.get(die).setImageResource(dieInactiveImages[tag]);
             dieViews.get(die).setActivated(true);
         }
     }
 
-    public void resetDices() {
-        int i = 0;
+    public void resetDice() {
         for (ImageView dieView : dieViews) {
             if(dieView.isActivated()) {
-                dieView.setImageResource(dieImages[values.get(i - 1)]);
+                Integer tag = (Integer) dieView.getTag();
+                dieView.setImageResource(dieImages[tag]);
                 dieView.setActivated(false);
-                i++;
             }
         }
+    }
+
+    public int getPlayable() {
+        int playabelDice = 0;
+        for (ImageView dieView : dieViews) {
+            if(!dieView.isActivated()) {
+                playabelDice++;
+            }
+        }
+        return playabelDice;
     }
 }
