@@ -56,7 +56,7 @@ public class GameHandler {
         return false;
     }
 
-    private void continueRound(int tempResult) {
+    public void continueRound(int tempResult) {
         turnResult += tempResult;
         TextView turnScore = (TextView) activity.findViewById(R.id.turnScore);
         turnScore.setText(String.valueOf(turnResult));
@@ -88,9 +88,5 @@ public class GameHandler {
 
     public void toggle(int index) {
         if((totalResult >= 300 && turnResult == 0) || (turnResult > 0)) dice.toggle(index);
-    }
-
-    public int getTotalRestult() {
-        return totalResult;
     }
 }

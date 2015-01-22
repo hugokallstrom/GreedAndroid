@@ -4,60 +4,145 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
+
+import java.util.ArrayList;
 
 public class GameActivity extends Activity {
 
     GameHandler gameHandler;
+    Dice dice;
+    Score score;
+    private boolean sameRound;
+    private int turnResult;
+    private int rounds;
+    private int totalResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         gameHandler = new GameHandler(this);
+        dice = new Dice(this);
+        score = new Score(this);
     }
 
     public void ButtonOnClick(View v) {
         switch (v.getId()) {
             case R.id.throwButton:
-                gameHandler.throwDice();
+                rollDice();
                 break;
             case R.id.scoreButton:
-                gameHandler.saveScore();
+                saveScore();
                 break;
             case R.id.die1:
-                gameHandler.toggle(0);
+                toggle(0);
                 break;
             case R.id.die2:
-                gameHandler.toggle(1);
+                toggle(1);
                 break;
             case R.id.die3:
-                gameHandler.toggle(2);
+                toggle(2);
                 break;
             case R.id.die4:
-                gameHandler.toggle(3);
+                toggle(3);
                 break;
             case R.id.die5:
-                gameHandler.toggle(4);
+                toggle(4);
                 break;
             case R.id.die6:
-                gameHandler.toggle(5);
+                toggle(5);
                 break;
 
         }
     }
 
+    private void rollDice() {
+        ArrayList<Integer> diceValues = dice.roll();
+        int calculatedScore = score.calc(diceValues);
+
+        if(score.allScores()) {
+            sameRound = true;
+            continueRound(calculatedScore);
+            dice.resetDice();
+            return;
+        }
+
+        int playableDice = dice.getPlayable();
+        if(validThrow(calculatedScore, playableDice)) {
+            continueRound(calculatedScore);
+        } else {
+            resetRound();
+        }
+    }
+
+    private boolean validThrow(Integer result, Integer playableDice) {
+        if((result < 300 && turnResult == 0) || (turnResult > 0 && playableDice == 6 && !sameRound) || (result < 50 && playableDice < 6)) {
+            return false;
+        } else if(result >= 300 || (result > 0 && playableDice < 6) || (sameRound && result > 0)) {
+            return true;
+        }
+        return false;
+    }
+
+    public void continueRound(int tempResult) {
+        turnResult += tempResult;
+        TextView turnScore = (TextView) findViewById(R.id.turnScore);
+        turnScore.setText(String.valueOf(turnResult));
+    }
+
+    private void resetRound() {
+        TextView turnScore = (TextView) findViewById(R.id.turnScore);
+        turnScore.setText(String.valueOf(0));
+        dice.resetDice();
+        turnResult = 0;
+        sameRound = false;
+        rounds++;
+    }
+
+    public void saveScore() {
+        if(totalResult + turnResult >= 10000) {
+            Log.v("WIN", "Win");
+        } else if(turnResult >= 300) {
+            dice.resetDice();
+            rounds++;
+            totalResult += turnResult;
+            turnResult = 0;
+            changeScoreText();
+        }
+    }
+
+    private void changeScoreText() {
+        TextView currentScore = (TextView) findViewById(R.id.currentScore);
+        TextView turnScore = (TextView) findViewById(R.id.turnScore);
+        currentScore.setText(String.valueOf(totalResult));
+        turnScore.setText(String.valueOf(0));
+    }
+
+    public void toggle(int index) {
+        if((totalResult >= 300 && turnResult == 0) || (turnResult > 0)) dice.toggle(index);
+    }
+
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putBoolean("MyBoolean", true);
-        savedInstanceState.putDouble("myDouble", 1.9);
-        savedInstanceState.putInt("MyInt", 1);
-        savedInstanceState.putString("MyString", "Welcome back to Android");
+        savedInstanceState.putBoolean("sameRound", sameRound);
+        savedInstanceState.putInt("turnResult", turnResult);
+        savedInstanceState.putInt("totalResult", totalResult);
+        Log.v("res", String.valueOf(turnResult));
+        savedInstanceState.putInt("rounds", rounds);
     }
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Log.v("test", String.valueOf(gameHandler.getTotalRestult()));
+        sameRound = savedInstanceState.getBoolean("sameRound");
+        turnResult = savedInstanceState.getInt("turnResult");
+        totalResult = savedInstanceState.getInt("totalResult");
+        rounds = savedInstanceState.getInt("rounds");
+        TextView currentScore = (TextView) findViewById(R.id.currentScore);
+        TextView turnScore = (TextView) findViewById(R.id.turnScore);
+        currentScore.setText(String.valueOf(totalResult));
+        turnScore.setText(String.valueOf(turnResult));
     }
 }

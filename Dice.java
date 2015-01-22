@@ -1,7 +1,6 @@
 package huka.com.greed;
 
 import android.app.Activity;
-import android.util.Log;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
