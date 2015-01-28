@@ -86,4 +86,20 @@ public class Dice {
         }
         return playabelDice;
     }
+
+    public ArrayList<ImageView> getDieViews() {
+        return dieViews;
+    }
+
+    public void setDieViews(boolean[] diceActivated, ArrayList<Integer> diceTags) {
+        for(int i = 0; i < dieViews.size(); i++) {
+            dieViews.get(i).setTag(diceTags.get(i));
+            if(diceActivated[i]) {
+                dieViews.get(i).setActivated(false);
+            } else {
+                dieViews.get(i).setActivated(true);
+            }
+            toggle(i);
+        }
+    }
 }
